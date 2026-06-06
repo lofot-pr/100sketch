@@ -1,0 +1,1284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>100 Días de Sketch</title>
+<!-- PWA -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="100 Días">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#8B7355">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%238B7355'/%3E%3Ctext y='.9em' font-size='70' x='12'%3E✏️%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=DM+Sans:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --cream: #FAF9F6;
+  --warm-white: #FFFEF9;
+  --brown: #8B7355;
+  --brown-hover: #7A6347;
+  --brown-light: #F2EDE4;
+  --dark: #1C1917;
+  --mid: #57534E;
+  --light: #A8A29E;
+  --lighter: #D6D3D1;
+  --border: #E7E5E4;
+  --sage: #6B7B5E;
+  --serif: 'Cormorant Garamond', Georgia, serif;
+  --sans: 'DM Sans', system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--cream);
+  color: var(--dark);
+  min-height: 100vh;
+  font-weight: 300;
+}
+
+/* ── HEADER ── */
+header {
+  padding: 2.5rem 2rem 1.75rem;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+  background: var(--warm-white);
+}
+header h1 {
+  font-family: var(--serif);
+  font-size: 2rem;
+  font-weight: 300;
+  letter-spacing: 0.08em;
+  color: var(--dark);
+  margin-bottom: 0.2rem;
+}
+.header-sub {
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--light);
+  margin-bottom: 1.75rem;
+}
+.progress-wrap { max-width: 280px; margin: 0 auto; }
+.progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--light);
+  margin-bottom: 0.5rem;
+  letter-spacing: 0.04em;
+}
+.progress-track {
+  height: 1px;
+  background: var(--border);
+}
+.progress-fill {
+  height: 100%;
+  background: var(--brown);
+  transition: width 0.6s ease;
+}
+
+/* ── CALENDAR WRAPPER ── */
+.cal-wrapper {
+  max-width: 460px;
+  margin: 2rem auto;
+  padding: 0 1.5rem 4rem;
+}
+
+/* ── MONTH NAV ── */
+.month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.75rem;
+}
+.month-nav h2 {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: var(--dark);
+}
+.nav-btn {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--border);
+  background: none;
+  cursor: pointer;
+  color: var(--mid);
+  font-size: 0.85rem;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.18s;
+  line-height: 1;
+}
+.nav-btn:hover { background: var(--brown-light); border-color: var(--brown); color: var(--brown); }
+.nav-btn:disabled { opacity: 0.2; cursor: default; }
+.nav-btn:disabled:hover { background: none; border-color: var(--border); color: var(--mid); }
+
+/* ── WEEKDAY HEADERS ── */
+.cal-weekdays {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  margin-bottom: 0.4rem;
+}
+.cal-weekday {
+  text-align: center;
+  font-size: 0.62rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--lighter);
+  padding: 0.4rem 0;
+}
+
+/* ── CALENDAR GRID ── */
+.cal-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 3px;
+}
+.cal-cell {
+  aspect-ratio: 1;
+  min-height: 40px; /* fallback iOS */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  position: relative;
+  transition: background 0.15s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.cal-cell.empty { pointer-events: none; }
+
+/* date number */
+.cal-date {
+  font-size: 0.82rem;
+  line-height: 1;
+  color: var(--lighter); /* default: non-challenge */
+  font-weight: 300;
+}
+
+/* locked future challenge day */
+.cal-cell.locked .cal-date {
+  color: var(--lighter);
+}
+/* very subtle indicator that a future day is a challenge day */
+.cal-cell.locked::before {
+  content: '';
+  position: absolute;
+  bottom: 5px;
+  width: 3px; height: 3px;
+  background: var(--lighter);
+  border-radius: 50%;
+}
+
+/* unlocked past/current challenge day */
+.cal-cell.available {
+  cursor: pointer;
+}
+.cal-cell.available .cal-date {
+  color: var(--dark);
+  font-weight: 400;
+}
+.cal-cell.available:hover {
+  background: var(--brown-light);
+}
+.cal-cell.available:hover .cal-date {
+  color: var(--brown);
+}
+
+/* today */
+.cal-cell.today .cal-date {
+  width: 26px; height: 26px;
+  background: var(--brown);
+  color: white;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 400;
+}
+
+/* completed indicator */
+.cal-cell.done::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  width: 4px; height: 4px;
+  background: var(--sage);
+  border-radius: 50%;
+}
+/* don't show locked dot when done */
+.cal-cell.done.locked::before { display: none; }
+
+/* day number label (only for available) */
+.cal-label {
+  font-size: 0.58rem;
+  color: var(--brown);
+  opacity: 0.6;
+  margin-top: 1px;
+  letter-spacing: 0.02em;
+}
+
+/* ── SAVE URL BUTTON ── */
+.save-url-wrap {
+  text-align: center;
+  margin-top: 1.5rem;
+}
+.btn-save-url {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brown);
+  background: none;
+  border: 1px solid var(--brown);
+  border-radius: 20px;
+  padding: 0.45rem 1.1rem;
+  cursor: pointer;
+  transition: all 0.18s;
+}
+.btn-save-url:hover { background: var(--brown-light); }
+.btn-save-url.copied { color: var(--sage); border-color: var(--sage); }
+
+/* ── LEGEND ── */
+.legend {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.68rem;
+  color: var(--light);
+  letter-spacing: 0.06em;
+}
+.l-dot { width: 8px; height: 8px; border-radius: 50%; }
+.l-today { background: var(--brown); }
+.l-done { background: var(--sage); }
+.l-available { background: var(--dark); }
+
+/* ── MODAL OVERLAY ── */
+.overlay {
+  position: fixed; inset: 0;
+  background: rgba(28,25,23,0.35);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 200;
+  padding: 1.25rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.22s;
+}
+.overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* ── MODAL CARD ── */
+.modal {
+  background: var(--warm-white);
+  border-radius: 14px;
+  padding: 2.25rem 2.25rem 2rem;
+  max-width: 420px;
+  width: 100%;
+  position: relative;
+  max-height: 92vh;
+  overflow-y: auto;
+  transform: translateY(18px);
+  transition: transform 0.24s cubic-bezier(0.22,1,0.36,1);
+}
+.overlay.open .modal { transform: translateY(0); }
+
+/* scrollbar */
+.modal::-webkit-scrollbar { width: 4px; }
+.modal::-webkit-scrollbar-track { background: transparent; }
+.modal::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.modal-close {
+  position: absolute; top: 1rem; right: 1rem;
+  background: none; border: none; cursor: pointer;
+  color: var(--lighter); font-size: 1.1rem;
+  line-height: 1; padding: 0.2rem;
+  transition: color 0.15s;
+}
+.modal-close:hover { color: var(--mid); }
+
+/* header row */
+.modal-header { display: flex; align-items: flex-start; gap: 1rem; margin-bottom: 1.5rem; }
+.modal-num {
+  font-family: var(--serif);
+  font-size: 3.2rem;
+  font-weight: 300;
+  color: var(--brown);
+  line-height: 1;
+  min-width: 2.4rem;
+}
+.modal-meta { display: flex; flex-direction: column; gap: 0.3rem; padding-top: 0.5rem; }
+.modal-date {
+  font-size: 0.74rem;
+  color: var(--light);
+  letter-spacing: 0.05em;
+}
+.modal-tag {
+  font-size: 0.63rem;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--brown);
+  background: var(--brown-light);
+  padding: 0.18rem 0.55rem;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.modal-title {
+  font-family: var(--serif);
+  font-size: 1.85rem;
+  font-weight: 400;
+  color: var(--dark);
+  line-height: 1.2;
+  margin-bottom: 0.75rem;
+}
+.modal-desc {
+  font-size: 0.86rem;
+  color: var(--mid);
+  line-height: 1.7;
+  margin-bottom: 1.75rem;
+  font-weight: 300;
+}
+
+.modal-divider { height: 1px; background: var(--border); margin-bottom: 1.25rem; }
+
+.refs-heading {
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--light);
+  margin-bottom: 0.75rem;
+}
+.ref-btns { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+.ref-btn {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  padding: 0.5rem 1rem;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-family: var(--sans);
+  font-weight: 300;
+  color: var(--mid);
+  background: var(--warm-white);
+  transition: all 0.18s;
+  letter-spacing: 0.02em;
+}
+.ref-btn:hover { border-color: var(--brown); color: var(--brown); background: var(--brown-light); }
+.ref-btn svg { width: 13px; height: 13px; flex-shrink: 0; opacity: 0.6; }
+
+.done-btn {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 0.8rem;
+  font-weight: 300;
+  letter-spacing: 0.06em;
+  color: var(--mid);
+  transition: all 0.2s;
+}
+.done-btn:hover { background: var(--sage); border-color: var(--sage); color: white; }
+.done-btn.is-done { background: var(--sage); border-color: var(--sage); color: white; }
+
+/* ── FOTO DEL DÍA ── */
+.photo-section {
+  margin-top: 1.25rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--border);
+}
+.photo-heading {
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--light);
+  margin-bottom: 0.75rem;
+}
+.photo-preview {
+  width: 100%;
+  aspect-ratio: 4/3;
+  border-radius: 8px;
+  object-fit: cover;
+  display: block;
+  margin-bottom: 0.6rem;
+  background: var(--brown-light);
+}
+.photo-placeholder {
+  width: 100%;
+  aspect-ratio: 4/3;
+  border-radius: 8px;
+  border: 1.5px dashed var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  cursor: pointer;
+  background: var(--cream);
+  transition: all 0.18s;
+  margin-bottom: 0.6rem;
+  color: var(--light);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+}
+.photo-placeholder:hover { border-color: var(--brown); color: var(--brown); background: var(--brown-light); }
+.photo-placeholder svg { width: 22px; height: 22px; opacity: 0.5; }
+.photo-actions { display: flex; gap: 0.5rem; }
+.photo-btn {
+  flex: 1;
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  background: none;
+  cursor: pointer;
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  font-weight: 300;
+  color: var(--mid);
+  letter-spacing: 0.04em;
+  transition: all 0.18s;
+  text-align: center;
+}
+.photo-btn:hover { border-color: var(--brown); color: var(--brown); background: var(--brown-light); }
+.photo-btn.delete { color: #b97070; border-color: #e8d5d5; }
+.photo-btn.delete:hover { background: #fdf0f0; border-color: #b97070; }
+
+/* ── GALERÍA DE AVANCE ── */
+.gallery-overlay {
+  position: fixed; inset: 0;
+  background: rgba(28,25,23,0.95);
+  z-index: 300;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s;
+}
+.gallery-overlay.open { opacity: 1; pointer-events: all; }
+.gallery-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.5rem;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.gallery-title {
+  font-family: var(--serif);
+  font-size: 1.3rem;
+  font-weight: 300;
+  color: white;
+  letter-spacing: 0.06em;
+}
+.gallery-close {
+  background: none; border: none; cursor: pointer;
+  color: rgba(255,255,255,0.5); font-size: 1.2rem;
+  padding: 0.2rem;
+}
+.gallery-close:hover { color: white; }
+
+/* Slideshow */
+.slideshow-wrap {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  position: relative;
+}
+.slideshow-img {
+  max-width: 100%;
+  max-height: 55vh;
+  border-radius: 10px;
+  object-fit: contain;
+  display: block;
+}
+.slideshow-caption {
+  margin-top: 0.85rem;
+  text-align: center;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+}
+.slideshow-caption strong { color: white; font-weight: 400; }
+.slideshow-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1rem 1.5rem 1.5rem;
+}
+.ss-btn {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: none;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.18s;
+}
+.ss-btn:hover { background: rgba(255,255,255,0.1); }
+.ss-btn:disabled { opacity: 0.2; cursor: default; }
+.ss-counter {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.4);
+  letter-spacing: 0.1em;
+  min-width: 60px;
+  text-align: center;
+}
+.ss-play {
+  width: 48px; height: 48px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.08);
+  color: white;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.18s;
+}
+.ss-play:hover { background: rgba(255,255,255,0.18); }
+
+/* Botón avance en header */
+.btn-gallery {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-family: var(--sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--brown);
+  background: none;
+  border: 1px solid var(--brown);
+  border-radius: 20px;
+  padding: 0.45rem 1.1rem;
+  cursor: pointer;
+  transition: all 0.18s;
+  margin-top: 0.75rem;
+}
+.btn-gallery:hover { background: var(--brown-light); }
+
+/* ── INSTALL BANNER ── */
+.install-banner {
+  display: none;
+  background: var(--brown-light);
+  border-bottom: 1px solid #E2D9CC;
+  padding: 0.65rem 1rem 0.65rem 1.25rem;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  font-size: 0.75rem;
+  color: var(--mid);
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+}
+.install-banner.visible { display: flex; }
+.install-banner strong { color: var(--brown); }
+.install-dismiss {
+  background: none; border: none; cursor: pointer;
+  color: var(--light); font-size: 0.9rem; flex-shrink: 0;
+  padding: 0.15rem;
+}
+
+@media (max-width: 480px) {
+  header { padding: 1.75rem 1.25rem 1.5rem; }
+  header h1 { font-size: 1.6rem; }
+  .cal-wrapper { padding: 0 0.75rem 3rem; }
+  .modal { padding: 1.75rem 1.25rem 1.75rem; }
+  .modal-num { font-size: 2.6rem; }
+  .modal-title { font-size: 1.55rem; }
+  .cal-grid { gap: 2px; }
+  .ref-btns { flex-direction: column; }
+  .ref-btn { width: 100%; justify-content: center; padding: 0.65rem 1rem; }
+  .done-btn { padding: 0.85rem; font-size: 0.85rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- INSTALL BANNER (móvil, solo en browser, no cuando ya está instalada) -->
+<div class="install-banner" id="installBanner">
+  <span>📱 Instalar como app: <strong>Safari → Compartir → Añadir a pantalla de inicio</strong></span>
+  <button class="install-dismiss" id="installDismiss">✕</button>
+</div>
+
+<!-- HEADER -->
+<header>
+  <h1>100 Días de Sketch</h1>
+  <p class="header-sub">Un dibujo al día · Ilustración vintage</p>
+  <div class="progress-wrap">
+    <div class="progress-meta">
+      <span id="pDone">0 completados</span>
+      <span id="pLeft">100 restantes</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="pFill" style="width:0%"></div>
+    </div>
+  </div>
+  <button class="btn-gallery" id="btnGallery">🎞 Ver mi avance</button>
+</header>
+
+<!-- CALENDAR -->
+<div class="cal-wrapper">
+  <div class="month-nav">
+    <button class="nav-btn" id="btnPrev">&#8592;</button>
+    <h2 id="monthTitle"></h2>
+    <button class="nav-btn" id="btnNext">&#8594;</button>
+  </div>
+  <div class="cal-weekdays">
+    <div class="cal-weekday">L</div>
+    <div class="cal-weekday">M</div>
+    <div class="cal-weekday">X</div>
+    <div class="cal-weekday">J</div>
+    <div class="cal-weekday">V</div>
+    <div class="cal-weekday">S</div>
+    <div class="cal-weekday">D</div>
+  </div>
+  <div class="cal-grid" id="calGrid"></div>
+  <div class="legend">
+    <div class="legend-item"><div class="l-dot l-today"></div><span>Hoy</span></div>
+    <div class="legend-item"><div class="l-dot l-available"></div><span>Disponible</span></div>
+    <div class="legend-item"><div class="l-dot l-done"></div><span>Completado</span></div>
+  </div>
+  <div class="save-url-wrap">
+    <button class="btn-save-url" id="btnSaveUrl">🔖 Guardar progreso</button>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal">
+    <button class="modal-close" id="btnClose">&#10005;</button>
+    <div class="modal-header">
+      <div class="modal-num" id="mNum"></div>
+      <div class="modal-meta">
+        <div class="modal-date" id="mDate"></div>
+        <span class="modal-tag" id="mTag"></span>
+      </div>
+    </div>
+    <div class="modal-title" id="mTitle"></div>
+    <div class="modal-desc" id="mDesc"></div>
+    <div class="modal-divider"></div>
+    <div class="refs-heading">Referencias</div>
+    <div class="ref-btns">
+      <a class="ref-btn" id="rPhoto" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+        </svg>
+        Fotografía
+      </a>
+      <a class="ref-btn" id="rSketch" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
+        </svg>
+        Boceto
+      </a>
+    </div>
+    <button class="done-btn" id="btnDone">Marcar como completado</button>
+
+    <!-- Foto del día -->
+    <div class="photo-section">
+      <div class="photo-heading">Mi dibujo</div>
+      <div id="photoPlaceholder" class="photo-placeholder">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/>
+        </svg>
+        Añadir foto del dibujo
+      </div>
+      <img id="photoPreview" class="photo-preview" style="display:none" alt="Mi dibujo"/>
+      <div class="photo-actions" id="photoActions" style="display:none">
+        <button class="photo-btn" id="btnChangePhoto">Cambiar foto</button>
+        <button class="photo-btn delete" id="btnDeletePhoto">Eliminar</button>
+      </div>
+      <input type="file" id="photoInput" accept="image/*" style="display:none">
+    </div>
+  </div>
+</div>
+
+<!-- GALERÍA DE AVANCE -->
+<div class="gallery-overlay" id="galleryOverlay">
+  <div class="gallery-header">
+    <span class="gallery-title">Mi progreso</span>
+    <button class="gallery-close" id="btnGalleryClose">✕</button>
+  </div>
+  <div class="slideshow-wrap">
+    <img id="ssImg" class="slideshow-img" alt=""/>
+    <div class="slideshow-caption" id="ssCaption"></div>
+  </div>
+  <div class="slideshow-nav">
+    <button class="ss-btn" id="ssPrev">&#8592;</button>
+    <button class="ss-play" id="ssPlay">▶</button>
+    <span class="ss-counter" id="ssCounter"></span>
+    <button class="ss-btn" id="ssNext">&#8594;</button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════
+// DATA — 100 días
+// ═══════════════════════════════════════
+const DAYS = [
+  // ── BLOQUE 1: FUNDAMENTOS (1–25) ──
+  {b:1, t:"Cubo", d:"El punto de partida. Dibuja un cubo con líneas precisas y trabaja cada cara con un valor de gris distinto. La arista más cercana, la más oscura.", p:"wooden cube object photography still life", s:"cube biro pen shading illustration tutorial"},
+  {b:1, t:"Esfera", d:"La forma más difícil de dominar. El reto no es el contorno, sino el gradiente que la hace parecer tridimensional.", p:"sphere ball photography still life lighting", s:"sphere biro pen shading illustration"},
+  {b:1, t:"Cilindro", d:"Elipses que cierran arriba y abajo. Observa cómo la elipse superior e inferior cambian según tu punto de vista.", p:"cylinder object photography still life", s:"cylinder biro pen illustration tutorial"},
+  {b:1, t:"Taza de té", d:"Primer objeto cotidiano. Trabaja el asa, la curva del borde y la relación entre el cuerpo cilíndrico y la base.", p:"vintage tea cup ceramic photography still life", s:"tea cup vintage biro pen illustration"},
+  {b:1, t:"Botella de cristal antigua", d:"Simetría y proporciones. El cuello, los hombros y la base de una botella apotecaria son tres cilindros en uno.", p:"vintage apothecary glass bottle photography", s:"antique glass bottle biro pen illustration"},
+  {b:1, t:"Manzana", d:"Forma orgánica y asimétrica. El rabillo y la pequeña hendidura son los dos detalles que la hacen reconocible.", p:"apple fruit photography still life", s:"apple fruit biro pen illustration botanical"},
+  {b:1, t:"Pera", d:"Curva más compleja que la manzana. Observa cómo se ensancha en los tres cuartos inferiores y se estrecha en el cuello.", p:"pear fruit photography still life", s:"pear fruit biro pen illustration botanical"},
+  {b:1, t:"Llave antigua", d:"Forma simple con detalles en los dientes. El ojal de la cabeza y el patrón del palastro son los elementos clave.", p:"antique vintage key photography macro", s:"antique key biro pen illustration vintage"},
+  {b:1, t:"Tijeras de costura", d:"Dos formas simétricas unidas por un tornillo. Anillos de distintos tamaños, tornillo central y hojas que se cruzan.", p:"vintage sewing scissors photography", s:"sewing scissors biro pen illustration vintage"},
+  {b:1, t:"Dedal de costura", d:"Pequeño y con textura punteada. La cúpula de metal rebota la luz en cada punto. Practica el punteado (stippling).", p:"thimble sewing photography macro vintage", s:"thimble biro pen illustration stippling"},
+  {b:1, t:"Carrete de hilo", d:"Cilindro pequeño con hilo enrollado en espiral. Las vueltas del hilo crean líneas paralelas que se curvan en los extremos.", p:"thread spool sewing vintage photography", s:"thread spool biro pen sketch vintage pencil"},
+  {b:1, t:"Vela encendida", d:"La llama tiene su propia forma orgánica: ancha en la base, afinada en la punta. El goteo de cera añade vida.", p:"candle lit photography dramatic", s:"candle flame biro pen illustration vintage"},
+  {b:1, t:"Margarita", d:"Pétalos de longitud variable distribuidos alrededor del centro. Varía el ángulo y la longitud para que parezca natural.", p:"daisy flower photography closeup", s:"daisy flower biro pen illustration botanical"},
+  {b:1, t:"Hoja botánica", d:"Nervio central, nervios secundarios y perfil irregular. Observa una hoja real. La asimetría es lo que la hace orgánica.", p:"botanical leaf photography macro", s:"botanical leaf biro pen sketch vintage illustration"},
+  {b:1, t:"Seta del bosque", d:"Sombrero curvo sobre tronco corto. Las laminillas debajo del sombrero son el detalle que le da profundidad.", p:"mushroom forest photography macro", s:"mushroom botanical biro pen sketch vintage pencil"},
+  {b:1, t:"Bellota con capuchón", d:"Pequeña pero llena de detalle: el capuchón tiene textura rugosa y el fruto es liso y brillante. Dos texturas en un objeto.", p:"acorn autumn photography macro closeup", s:"acorn biro pen illustration botanical autumn"},
+  {b:1, t:"Piña de pino", d:"Las escamas en espiral siguen la secuencia de Fibonacci. Un patrón geométrico perfectamente natural.", p:"pine cone photography macro botanical", s:"pine cone botanical biro pen illustration"},
+  {b:1, t:"Concha de caracol", d:"La espiral parte de un punto central y crece. Las estrías siguen la misma lógica. Un ejercicio de geometría orgánica.", p:"snail shell photography macro closeup", s:"snail shell spiral biro pen illustration"},
+  {b:1, t:"Botón de costura vintage", d:"Círculo con dos o cuatro ojales y borde tallado. Añade hilo cruzado entre los ojales para completarlo.", p:"vintage sewing buttons photography macro", s:"sewing button biro pen illustration macro"},
+  {b:1, t:"Lazo de tela", d:"Forma simétrica y fluida. Los pliegues internos le dan volumen: las zonas plegadas son las más oscuras.", p:"fabric bow ribbon photography vintage", s:"bow ribbon fabric biro pen illustration"},
+  {b:1, t:"Pluma de escribir (quill)", d:"El cañón es rígido y brillante; las barbas son suaves y ligeras. Dos texturas completamente opuestas en un solo objeto.", p:"quill pen feather photography vintage ink", s:"quill pen biro pen vintage illustration drawing"},
+  {b:1, t:"Tintero de cristal", d:"Pequeño frasco de cuello estrecho y base cuadrada. La tinta oscura dentro crea una masa que ancla el dibujo.", p:"glass inkwell vintage photography", s:"inkwell glass vintage biro pen illustration"},
+  {b:1, t:"Libro cerrado antiguo", d:"Cubierta de cuero, lomo cosido y páginas envejecidas. Los cantos dorados son el detalle final.", p:"old leather book photography vintage", s:"vintage book biro pen illustration leather"},
+  {b:1, t:"Papel arrugado", d:"Coge una hoja, arrúgala y obsérvala. Las aristas de los pliegues son líneas de sombra, las zonas planas reciben la luz.", p:"crumpled paper photography macro texture", s:"crumpled paper biro pen sketch tutorial pencil"},
+  {b:1, t:"Cubiertos de plata", d:"Tenedor y cuchara de plata. El relieve del mango y el brillo metálico en el cuenco de la cuchara son el reto.", p:"silver cutlery vintage photography still life", s:"vintage silver cutlery biro pen illustration"},
+
+  // ── BLOQUE 2: EXPLORACIÓN (26–50) ──
+  {b:2, t:"Silla de madera antigua", d:"Perspectiva de tres cuartos. Patas torneadas, travesaños y asiento de enea. Empieza por el rectángulo del asiento.", p:"antique wooden chair photography", s:"antique wooden chair biro pen sketch perspective"},
+  {b:2, t:"Maceta de terracota con suculenta", d:"La terracota porosa y la suculenta orgánica son dos texturas completamente distintas. El contraste es el ejercicio.", p:"terracotta pot succulent photography", s:"succulent terracotta pot biro pen sketch"},
+  {b:2, t:"Cámara de fuelle antigua", d:"Cuerpo de cuero plisado y objetivo circular. Un objeto muy ilustrable: geométrico y orgánico a la vez.", p:"antique bellows camera photography vintage", s:"vintage bellows camera biro pen illustration"},
+  {b:2, t:"Gafas redondas vintage", d:"Dos círculos con montura fina y patillas estrechas. El reflejo en los cristales añade una dimensión de luz.", p:"round vintage glasses 1930s photography", s:"vintage round glasses biro pen illustration"},
+  {b:2, t:"Reloj de bolsillo", d:"Caja circular, esfera con números romanos, agujas y cadena. Los detalles del mecanismo son el alma de este objeto.", p:"vintage pocket watch photography antique", s:"pocket watch vintage biro pen illustration"},
+  {b:2, t:"Violín", d:"La caja de resonancia en forma de ocho, las f-holes simétricas y las clavijas en espiral. Curvilíneo por naturaleza.", p:"violin photography antique wood", s:"violin biro pen illustration musical instrument"},
+  {b:2, t:"Botines de época con cordones", d:"Plataforma, caña alta y cordones entrelazados. Múltiples planos de cuero con costuras visibles.", p:"vintage lace-up ankle boots photography", s:"vintage boots biro pen illustration lace"},
+  {b:2, t:"Maleta pequeña antigua", d:"Esquinas reforzadas de metal, asa de cuero y hebillas laterales. La pátina del cuero es el detalle de textura.", p:"vintage small leather suitcase photography", s:"vintage suitcase biro pen illustration leather"},
+  {b:2, t:"Paraguas cerrado vintage", d:"Tela plegada, varillaje visible y mango curvo de madera. Las costillas del paraguas son líneas paralelas con perspectiva.", p:"vintage closed umbrella photography", s:"vintage umbrella biro pen illustration"},
+  {b:2, t:"Cafetera italiana Moka", d:"La icónica Moka: octágonos, válvula de presión y pitorro curvo. Uno de los objetos más ilustrables de la cocina.", p:"moka pot coffee maker photography still life", s:"moka pot biro pen illustration vintage"},
+  {b:2, t:"Cesta de mimbre con frutas", d:"Primera composición: trabaja la superposición de objetos, las sombras proyectadas y el tejido del mimbre.", p:"wicker basket fruit still life photography", s:"wicker basket fruit still life biro pen sketch"},
+  {b:2, t:"Florero con flores silvestres", d:"Florero geométrico con flores asimétricas y naturales. El caos controlado de las flores silvestres frente a la rigidez del jarrón.", p:"wildflowers vintage vase still life photography", s:"wildflowers vase biro pen vintage sketch"},
+  {b:2, t:"Farola de gas antigua", d:"Poste de hierro fundido y farol de cristal. Los adornos forjados del fuste son los detalles de carácter.", p:"vintage gas street lamp photography", s:"vintage street lamp biro pen illustration"},
+  {b:2, t:"Banco de jardín de hierro", d:"Hierro forjado con motivos ornamentales. Perspectiva de tres cuartos: el asiento se estrecha hacia el fondo.", p:"vintage cast iron garden bench photography", s:"vintage garden bench biro pen illustration"},
+  {b:2, t:"Sombrero de paja con flores", d:"Copa cilíndrica, ala amplia y cinta con flores secas. El tejido de la paja es una textura repetitiva muy característica.", p:"vintage straw hat flowers photography", s:"vintage straw hat biro pen illustration"},
+  {b:2, t:"Cesto de costura", d:"Cesto con hilos de colores, agujas, tijeras y dedal dentro. Primera composición de objetos pequeños superpuestos.", p:"vintage sewing basket photography", s:"vintage sewing basket biro pen sketch"},
+  {b:2, t:"Regadera de jardín antigua", d:"Metal con pátina, pitorro largo y boquilla de ducha. Una forma icónica que es casi una ilustración en sí misma.", p:"vintage garden watering can photography", s:"vintage watering can biro pen illustration"},
+  {b:2, t:"Bicicleta antigua", d:"Cuadro, ruedas con radios, sillín de cuero y manillar. Empieza siempre por el cuadro como estructura, luego las ruedas.", p:"vintage bicycle photography antique", s:"vintage bicycle biro pen illustration"},
+  {b:2, t:"Columpio de madera en árbol", d:"Tabla colgada con cuerdas atadas a una rama. Composición vertical: la rama, las cuerdas y el asiento como guías.", p:"wooden tree swing photography vintage", s:"tree swing biro pen illustration vintage"},
+  {b:2, t:"Maletín de cuero antiguo", d:"Cuero curtido, bisagras metálicas y cerradura de latón. Un objeto que habla de viajes y oficios de otra época.", p:"vintage leather briefcase doctor bag photography", s:"vintage leather briefcase biro pen illustration"},
+  {b:2, t:"Caja de madera con bisagras", d:"Textura de madera envejecida con vetas, bisagras de metal y cierre de latón. La tapa entreabierta sugiere lo que hay dentro.", p:"vintage wooden box hinges photography", s:"vintage wooden box biro pen illustration"},
+  {b:2, t:"Ventana con flores en alféizar", d:"Marco de madera con pintura envejecida y macetas con flores en el exterior. La perspectiva del marco es el reto.", p:"vintage window flowers windowsill photography", s:"window flowers windowsill biro pen sketch vintage"},
+  {b:2, t:"Libro abierto con ilustraciones", d:"Las páginas curvas forman una cúpula suave. El lomo al centro, el texto sugerido y una pequeña ilustración en la página.", p:"open illustrated vintage book photography", s:"vintage open book biro pen illustration"},
+  {b:2, t:"Jardinera con hierbas", d:"Caja de madera con varias plantas en fila, cada una con su etiqueta de papel escrita a mano. Ritmo y variedad.", p:"herb garden wooden box photography vintage", s:"herb garden vintage biro pen illustration"},
+  {b:2, t:"Mesa de jardín con té", d:"¡Mitad del reto! Still life completo: mesa de hierro, taza de té, cucharilla, flor en jarrón y pastelito en plato.", p:"vintage garden tea table still life photography", s:"vintage garden tea table still life sketch"},
+
+  // ── BLOQUE 3: TÉCNICA (51–75) ──
+  {b:3, t:"Vaso con flores (transparencia)", d:"La luz se refracta en el cristal. Los tallos cambian de dirección al verse a través del agua. Trabaja el contraste entre opaco y transparente.", p:"glass vase flowers water photography light", s:"glass vase flowers transparency biro pen sketch"},
+  {b:3, t:"Encaje: textura repetitiva", d:"El patrón entrelazado del encaje se construye con líneas muy finas que forman una rejilla orgánica. Paciencia y presión mínima.", p:"vintage lace fabric texture photography macro", s:"lace texture biro pen illustration vintage"},
+  {b:3, t:"Madera envejecida con nudos", d:"Las vetas del árbol son líneas paralelas orgánicas interrumpidas por nudos oscuros y densos. Varía la presión del lápiz.", p:"old wood grain knots texture photography", s:"wood grain texture knots biro pen illustration"},
+  {b:3, t:"Papel envejecido y manchado", d:"Arrugas, manchas de humedad, esquinas dobladas y bordes irregulares. La textura de los materiales viejos como objeto de estudio.", p:"aged paper vintage texture photography macro", s:"aged paper vintage texture biro pen sketch"},
+  {b:3, t:"Metal oxidado", d:"El óxido crea texturas irregulares de color variado. El hatching (líneas cruzadas) es la mejor técnica para representarlo.", p:"rusty metal texture vintage photography macro", s:"rusty metal texture biro pen sketch hatching pencil"},
+  {b:3, t:"Musgo sobre piedra", d:"Musgo esponjoso y blando sobre roca dura e irregular. Dos texturas opuestas que se potencian mutuamente.", p:"moss stone texture photography nature macro", s:"moss on stone texture biro pen illustration"},
+  {b:3, t:"Corteza de árbol viejo", d:"Las grietas profundas y las protuberancias de la corteza crean luz y sombra dramáticas. Varía la presión a lo largo de cada línea.", p:"old tree bark texture photography closeup", s:"tree bark texture biro pen illustration detail"},
+  {b:3, t:"Pluma botánica ilustrada", d:"Raquis central rígido, barbas laterales y pequeño punto de color en la punta. Estilo lámina de historia natural del siglo XVIII.", p:"bird feather macro photography vintage", s:"feather botanical illustration biro pen vintage sketch"},
+  {b:3, t:"Composición de conchas", d:"Tres conchas de formas distintas: espiral, bivalvo y erizo. La superposición y las sombras proyectadas crean profundidad.", p:"seashells composition photography still life", s:"seashells composition vintage biro pen illustration"},
+  {b:3, t:"Tela con pliegues suaves", d:"La tela de algodón forma pliegues graduales. Las sombras en los valles son suaves, no duras. Esfumado sobre hatching.", p:"cotton fabric soft folds photography", s:"fabric soft folds biro pen illustration tutorial"},
+  {b:3, t:"Luz de vela con sombras dramáticas", d:"Alto contraste: el círculo cálido de luz alrededor de la llama y la oscuridad que lo rodea. El dibujo de luz negativa.", p:"candle dramatic light shadow photography dark", s:"candle dramatic shadow biro pen sketch chiaroscuro"},
+  {b:3, t:"Rama botánica con bayas", d:"Tallo principal, ramas secundarias, hojas en distintos ángulos y frutos redondos. Ritmo y variedad en una sola composición.", p:"botanical branch berries leaves vintage photography", s:"botanical branch berries biro pen vintage illustration"},
+  {b:3, t:"Interior de cajón antiguo", d:"Vista desde arriba (perspectiva picada). Los objetos dentro del cajón se superponen y se ven ligeramente en perspectiva.", p:"antique drawer objects top view photography", s:"drawer objects top view biro pen sketch vintage"},
+  {b:3, t:"Ventana con lluvia", d:"Gotitas de agua irregulares en el cristal con el exterior difuminado detrás. Primer ejercicio de atmósfera y ambiente.", p:"rainy window drops photography mood", s:"rainy window biro pen illustration atmosphere"},
+  {b:3, t:"Reflejo en espejo antiguo", d:"El espejo no refleja perfectamente: manchas, distorsiones y áreas opacas. Practica la simetría imperfecta.", p:"vintage antique mirror reflection photography", s:"antique mirror reflection biro pen illustration"},
+  {b:3, t:"Libros viejos apilados", d:"Lomos con títulos en letras desgastadas, páginas amarilladas y marcapáginas de cinta. El paso del tiempo en papel.", p:"antique books stacked photography still life", s:"antique books stacked biro pen sketch vintage pencil"},
+  {b:3, t:"Mano sosteniendo pluma", d:"Primera anatomía: la mano en gesto de escritura, dedos curvados en torno al objeto. Observa tu propia mano.", p:"hand holding pen writing photography reference", s:"hand holding pen biro pen sketch vintage illustration"},
+  {b:3, t:"Jarrón de porcelana con flores", d:"Porcelana con patrón floral pintado y flores naturales que salen por arriba. La superficie brillante frente a los pétalos mate.", p:"vintage porcelain vase flowers photography", s:"vintage porcelain vase flowers biro pen sketch"},
+  {b:3, t:"Set de escritura de época", d:"Pluma de tinta, tintero, lacre, matasellos y papel en composición horizontal. El objeto más literario del reto.", p:"vintage writing set antique photography", s:"vintage writing desk set biro pen illustration"},
+  {b:3, t:"Tarros con etiquetas a mano", d:"Cristal transparente, contenido visible (especias, flores secas) y etiquetas de papel con letra manuscrita.", p:"vintage glass jars labels handwritten photography", s:"vintage glass jars biro pen illustration labels"},
+  {b:3, t:"Lata decorativa antigua", d:"Lata con impresión ornamental de época, relieve en los bordes y tapa. El cilindro con historia y carácter.", p:"vintage decorative tin can photography antique", s:"vintage tin can decorative biro pen sketch"},
+  {b:3, t:"Mapa enrollado con cordel", d:"Papel envejecido en rollo, atado con cordel y sellado con lacre. La textura del papel mapa y los bordes irregulares.", p:"rolled vintage map paper photography", s:"vintage rolled map biro pen illustration"},
+  {b:3, t:"Lámpara de aceite de mesa", d:"Depósito de cristal, mecha y pantalla cóncava. La luz proyectada como sombra en la pared es el reto invisible del dibujo.", p:"vintage oil lamp photography still life", s:"vintage oil lamp biro pen illustration light"},
+  {b:3, t:"Tejido de punto con agujas", d:"Los bucles de lana forman un patrón repetitivo y orgánico. Las agujas cruzadas atraviesan la labor.", p:"knitting wool needles photography vintage", s:"knitting needles wool biro pen illustration"},
+  {b:3, t:"Rincón del ilustrador", d:"Tu espacio de dibujo real: mesa, materiales, luz. El sketch más honesto y personal de todo el reto.", p:"illustrator artist desk workspace vintage photography", s:"artist workspace biro pen vintage biro pen illustration"},
+
+  // ── BLOQUE 4: MAESTRÍA — Ilustración infantil vintage (76–100) ──
+  {b:4, t:"Erizo en el bosque", d:"Primer personaje animal. Cuerpo redondeado, púas estilizadas en la espalda y carita expresiva con ojos grandes. La forma base es casi una gota.", p:"hedgehog forest vintage children illustration", s:"hedgehog biro pen vintage children book illustration"},
+  {b:4, t:"Conejo con sombrero de paja", d:"Postura sentada, orejas largas dobladas y sombrero de paja con una pequeña flor. El traje añade carácter sin complicar la silueta.", p:"rabbit straw hat vintage storybook illustration", s:"rabbit biro pen vintage children illustration pencil"},
+  {b:4, t:"Ratón en su casita", d:"Ratoncillo en un espacio miniatura: muebles del tamaño de una cerilla, ventana redonda y chimenea de botón. La escala exagerada es clave.", p:"mouse tiny house vintage children illustration", s:"mouse home biro pen vintage storybook illustration"},
+  {b:4, t:"Zorro con cesta de frutos", d:"Silueta elegante y alargada del zorro, cola esponjosa y cesta en el brazo. La cesta añade narrativa sin necesidad de más contexto.", p:"fox basket forest vintage children book illustration", s:"fox biro pen vintage children illustration storybook"},
+  {b:4, t:"Búho en rama con libro", d:"Búho redondeado con plumas sugeridas por líneas, expresión sabia y un libro pequeño entre las garras. La rama curva lo ancla.", p:"owl book branch vintage children illustration", s:"owl book biro pen vintage illustration pencil storybook"},
+  {b:4, t:"Oso durmiendo entre flores", d:"La masa grande y suave del oso contrasta con las flores pequeñas a su alrededor. La escala exagerada y el contraste son el lenguaje de la ilustración infantil.", p:"bear sleeping flowers vintage children illustration", s:"bear flowers biro pen vintage children illustration"},
+  {b:4, t:"Rana con paraguas", d:"Postura erguida, paraguas abierto y lluvia diagonal en el fondo. La rana es casi redonda: mucho carácter con pocos trazos.", p:"frog umbrella rain vintage children illustration", s:"frog umbrella biro pen vintage storybook illustration"},
+  {b:4, t:"Gatito mirando una mariposa", d:"Postura de curiosidad: cabeza inclinada, pata levantada, cola enroscada. La mariposa fuera o en el borde del cuadro dirige la mirada.", p:"kitten butterfly vintage children illustration", s:"kitten butterfly biro pen vintage illustration pencil"},
+  {b:4, t:"Ardilla con bellota enorme", d:"La escala exagerada de la bellota (casi tan grande como la ardilla) crea humor sin palabras. Postura abrazada al fruto.", p:"squirrel giant acorn vintage children illustration", s:"squirrel acorn biro pen vintage illustration storybook"},
+  {b:4, t:"Pato con botitas de lluvia", d:"Forma redondeada del pato, cuello corto y botitas de agua diminutas. La expresión traviesa lo convierte en personaje.", p:"duck rain boots vintage children illustration", s:"duck boots biro pen vintage children illustration"},
+  {b:4, t:"Casita en el árbol", d:"Exterior de una casita integrada en el árbol: ventanas con cortinas, puerta pequeña, escalera de cuerda y chimenea con espiral de humo.", p:"treehouse vintage storybook illustration children", s:"treehouse biro pen vintage children book illustration"},
+  {b:4, t:"Casita de campo con jardín", d:"Fachada con enredaderas, jardín con flores silvestres, sendero de piedras y chimenea. El estilo cottage de los libros ilustrados clásicos.", p:"cottage garden vintage children book illustration", s:"cottage biro pen vintage illustration pencil storybook"},
+  {b:4, t:"Barca en lago tranquilo", d:"Barca de remos con agua tranquila que refleja el cielo, sauce llorón al fondo. Calma y quietud: pocos elementos, mucho silencio.", p:"rowboat lake vintage illustration children", s:"rowboat lake vintage biro pen illustration pencil"},
+  {b:4, t:"Jardín secreto con puerta", d:"Una puerta de madera entreabierta en un muro cubierto de hiedra. Lo que queda fuera del cuadro es tan importante como lo que está dentro.", p:"secret garden door ivy vintage illustration", s:"secret garden door biro pen vintage illustration"},
+  {b:4, t:"Escena: animal tomando el té", d:"Tu animal favorito sentado a una mesita con taza de té, pastelito y mantel bordado. Primera escena completa con personaje.", p:"animal tea party vintage children illustration", s:"animal tea party biro pen vintage illustration storybook"},
+  {b:4, t:"Escena: picnic en el bosque", d:"Manta de cuadros, cesta, dos o tres animales distintos en torno a ella. Primera composición con varios personajes e interacción.", p:"animals forest picnic vintage children illustration", s:"animals picnic biro pen vintage storybook illustration"},
+  {b:4, t:"Portada de libro ilustrado", d:"Un rectángulo central con el título enmarcado por elementos decorativos (ramas, flores, personajes pequeños en las esquinas).", p:"vintage children book cover illustration design", s:"biro pen vintage children book cover design"},
+  {b:4, t:"Personaje infantil estilo vintage", d:"Figura completa de niña o niño con ropa de época: proporciones estilizadas (cabeza grande, cuerpo corto), expresión inocente.", p:"vintage child character illustration girl boy 1900s", s:"vintage child character biro pen illustration"},
+  {b:4, t:"Mapa ilustrado imaginario", d:"Bosque, lago, montaña, casita y caminos. Los elementos del mapa medieval: rosa de los vientos, escala y letras manuscritas.", p:"vintage illustrated fantasy map children book", s:"vintage illustrated map biro pen illustration"},
+  {b:4, t:"Patrón: flores y hojas", d:"Elementos sueltos (flor abierta, capullo, hoja, ramita) que se repiten y combinan en distintas orientaciones. Para papel o endpapers.", p:"vintage floral pattern illustration botanical", s:"vintage floral pattern illustration sketch botanical"},
+  {b:4, t:"Paisaje de cuento: el bosque", d:"Árboles que forman un túnel de luz. El camino que se pierde en la distancia crea una perspectiva atmosférica suave.", p:"fairytale forest path light vintage illustration", s:"fairytale forest biro pen vintage illustration pencil"},
+  {b:4, t:"Patrón: sellos de animales", d:"Conejo, zorro, erizo, búho en formato circular o cuadrado tipo sello postal. Pequeños, expresivos, con filete alrededor.", p:"vintage animal stamp illustration children", s:"vintage animal stamp biro pen illustration"},
+  {b:4, t:"Página ilustrada con viñeta", d:"Una ilustración lateral o central acompañada de un párrafo de cuento. Composición editorial: el equilibrio entre texto e imagen.", p:"vintage illustrated book page text children", s:"vintage illustrated book page sketch design"},
+  {b:4, t:"Tu ilustración favorita, revisitada", d:"Vuelve al tema que más disfrutaste en estos 99 días. Con todo lo aprendido, dibújalo de nuevo. La evolución es la mayor recompensa.", p:"vintage illustration revisit improvement sketch", s:"vintage illustration revisit biro pen sketch progress"},
+  {b:4, t:"Portada de tu cuento", d:"El dibujo final: tu personaje protagonista con título, elementos decorativos y firma. No tiene que ser perfecto. Tiene que ser tuyo.", p:"vintage children book cover final illustration", s:"vintage children book cover final illustration sketch"},
+];
+
+const BLOCK_NAMES = {
+  1: "Fundamentos · Días 1–25",
+  2: "Exploración · Días 26–50",
+  3: "Técnica · Días 51–75",
+  4: "Maestría · Días 76–100",
+};
+
+// ═══════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════
+// Día 1 fijado: 5 de junio de 2026
+// Usamos constructor numérico (mes 0-indexado) para compatibilidad iOS Safari
+const START = new Date(2026, 5, 5); // 5 = junio
+
+// ── Persistencia sin servidor: los días completados se guardan en el hash de la URL ──
+function loadFromHash() {
+  try {
+    const hash = window.location.hash.slice(1);
+    if (!hash) return new Set();
+    const decoded = atob(hash);
+    return new Set(JSON.parse(decoded));
+  } catch(e) { return new Set(); }
+}
+function saveToHash(set) {
+  const encoded = btoa(JSON.stringify([...set]));
+  history.replaceState(null, '', '#' + encoded);
+}
+
+let completed = loadFromHash();
+// Current calendar month (starts at the month containing today)
+let viewYear = new Date().getFullYear();
+let viewMonth = new Date().getMonth();
+
+let activeDay = null;
+
+// ═══════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════
+// Nombres de meses y días en español (evita dependencia de toLocaleDateString en iOS)
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio',
+               'Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+const MESES_MIN = ['enero','febrero','marzo','abril','mayo','junio',
+                   'julio','agosto','septiembre','octubre','noviembre','diciembre'];
+const DIAS_SEMANA = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+
+function today() { const d = new Date(); d.setHours(0,0,0,0); return d; }
+// Usa hora local (no UTC) para evitar desfase horario en España
+function ymd(d) {
+  return d.getFullYear() + '-' +
+    String(d.getMonth()+1).padStart(2,'0') + '-' +
+    String(d.getDate()).padStart(2,'0');
+}
+
+// Returns challenge day number (1-100) for a date, or null
+function dayNum(date) {
+  const diff = Math.round((date - START) / 86400000);
+  return diff >= 0 && diff < 100 ? diff + 1 : null;
+}
+
+// Returns the calendar date for challenge day N
+function dayDate(n) {
+  const d = new Date(START); d.setDate(d.getDate() + n - 1); return d;
+}
+
+function isUnlocked(n) { return dayDate(n) <= today(); }
+
+function formatFullDate(d) {
+  return DIAS_SEMANA[d.getDay()] + ', ' + d.getDate() +
+    ' de ' + MESES_MIN[d.getMonth()] + ' de ' + d.getFullYear();
+}
+
+function pin(q) { return 'https://www.pinterest.com/search/pins/?q=' + encodeURIComponent(q); }
+
+// Min/max months for navigation
+function minMonth() { return { y: START.getFullYear(), m: START.getMonth() }; }
+function maxMonth() {
+  const end = dayDate(100);
+  return { y: end.getFullYear(), m: end.getMonth() };
+}
+
+// ═══════════════════════════════════════
+// CALENDAR
+// ═══════════════════════════════════════
+function renderCalendar() {
+  const t = today();
+  const todayStr = ymd(t);
+
+  // Month title (sin toLocaleDateString para compatibilidad iOS)
+  document.getElementById('monthTitle').textContent =
+    MESES[viewMonth] + ' ' + viewYear;
+
+  // Nav button states
+  const min = minMonth(), max = maxMonth();
+  document.getElementById('btnPrev').disabled =
+    viewYear < min.y || (viewYear === min.y && viewMonth <= min.m);
+  document.getElementById('btnNext').disabled =
+    viewYear > max.y || (viewYear === max.y && viewMonth >= max.m);
+
+  // Build grid
+  const grid = document.getElementById('calGrid');
+  grid.innerHTML = '';
+
+  const firstDay = new Date(viewYear, viewMonth, 1);
+  let dow = firstDay.getDay(); // 0=Sun
+  dow = dow === 0 ? 6 : dow - 1; // Mon=0 … Sun=6
+
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+
+  // Empty leading cells
+  for (let i = 0; i < dow; i++) {
+    const c = document.createElement('div');
+    c.className = 'cal-cell empty'; grid.appendChild(c);
+  }
+
+  // Day cells
+  for (let d = 1; d <= daysInMonth; d++) {
+    const date = new Date(viewYear, viewMonth, d);
+    const dn = dayNum(date);
+    const isToday = ymd(date) === todayStr;
+    const unlocked = dn ? isUnlocked(dn) : false;
+    const isDone = dn ? completed.has(dn) : false;
+
+    const c = document.createElement('div');
+    const cls = ['cal-cell'];
+    if (dn && unlocked) cls.push('available');
+    else if (dn && !unlocked) cls.push('locked');
+    if (isToday) cls.push('today');
+    if (isDone) cls.push('done');
+    c.className = cls.join(' ');
+
+    const dateEl = document.createElement('span');
+    dateEl.className = 'cal-date';
+    dateEl.textContent = d;
+    c.appendChild(dateEl);
+
+    if (dn && unlocked && !isToday) {
+      const lbl = document.createElement('span');
+      lbl.className = 'cal-label';
+      lbl.textContent = dn;
+      c.appendChild(lbl);
+    }
+    if (isToday && dn) {
+      const lbl = document.createElement('span');
+      lbl.className = 'cal-label';
+      lbl.textContent = dn;
+      c.appendChild(lbl);
+    }
+
+    if (dn && unlocked) {
+      c.addEventListener('click', () => openModal(dn));
+    }
+
+    grid.appendChild(c);
+  }
+
+  updateProgress();
+}
+
+// ═══════════════════════════════════════
+// PROGRESS
+// ═══════════════════════════════════════
+function updateProgress() {
+  const done = completed.size;
+  document.getElementById('pDone').textContent = done + ' completado' + (done !== 1 ? 's' : '');
+  document.getElementById('pLeft').textContent = (100 - done) + ' restante' + (100 - done !== 1 ? 's' : '');
+  document.getElementById('pFill').style.width = done + '%';
+}
+
+// ═══════════════════════════════════════
+// MODAL
+// ═══════════════════════════════════════
+function openModal(n) {
+  activeDay = n;
+  const day = DAYS[n - 1];
+
+  document.getElementById('mNum').textContent = n;
+  document.getElementById('mDate').textContent = formatFullDate(dayDate(n));
+  document.getElementById('mTag').textContent = BLOCK_NAMES[day.b];
+  document.getElementById('mTitle').textContent = day.t;
+  document.getElementById('mDesc').textContent = day.d;
+  document.getElementById('rPhoto').href = pin(day.p);
+  document.getElementById('rSketch').href = pin(day.s);
+
+  refreshDoneBtn();
+  refreshPhotoUI();
+  document.getElementById('overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  activeDay = null;
+}
+
+function refreshDoneBtn() {
+  const btn = document.getElementById('btnDone');
+  if (completed.has(activeDay)) {
+    btn.textContent = '✓ Completado';
+    btn.classList.add('is-done');
+  } else {
+    btn.textContent = 'Marcar como completado';
+    btn.classList.remove('is-done');
+  }
+}
+
+function toggleDone() {
+  if (!activeDay) return;
+  if (completed.has(activeDay)) completed.delete(activeDay);
+  else completed.add(activeDay);
+  saveToHash(completed);
+  refreshDoneBtn();
+  renderCalendar();
+}
+
+// ═══════════════════════════════════════
+// EVENTS
+// ═══════════════════════════════════════
+document.getElementById('btnPrev').addEventListener('click', () => {
+  if (viewMonth === 0) { viewYear--; viewMonth = 11; }
+  else viewMonth--;
+  renderCalendar();
+});
+document.getElementById('btnNext').addEventListener('click', () => {
+  if (viewMonth === 11) { viewYear++; viewMonth = 0; }
+  else viewMonth++;
+  renderCalendar();
+});
+document.getElementById('btnClose').addEventListener('click', closeModal);
+document.getElementById('overlay').addEventListener('click', e => {
+  if (e.target === document.getElementById('overlay')) closeModal();
+});
+document.getElementById('btnDone').addEventListener('click', toggleDone);
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+
+// ═══════════════════════════════════════
+// INSTALL BANNER
+// ═══════════════════════════════════════
+(function() {
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+  const isStandalone = window.matchMedia('(display-mode: standalone)').matches
+    || window.navigator.standalone === true;
+  const dismissed = sessionStorage.getItem('sk100_banner') === '1';
+
+  if (isMobile && !isStandalone && !dismissed) {
+    document.getElementById('installBanner').classList.add('visible');
+  }
+  document.getElementById('installDismiss').addEventListener('click', () => {
+    document.getElementById('installBanner').classList.remove('visible');
+    sessionStorage.setItem('sk100_banner', '1');
+  });
+})();
+
+// ── GUARDAR PROGRESO (copiar URL) ──
+document.getElementById('btnSaveUrl').addEventListener('click', function() {
+  const url = window.location.href;
+  if (navigator.share) {
+    navigator.share({ title: '100 Días de Sketch — mi progreso', url });
+  } else if (navigator.clipboard) {
+    navigator.clipboard.writeText(url).then(() => {
+      this.textContent = '✓ URL copiada';
+      this.classList.add('copied');
+      setTimeout(() => {
+        this.textContent = '🔖 Guardar progreso';
+        this.classList.remove('copied');
+      }, 2500);
+    });
+  } else {
+    prompt('Copia esta URL para guardar tu progreso:', url);
+  }
+});
+
+// ═══════════════════════════════════════
+// FOTOS
+// ═══════════════════════════════════════
+function photoKey(n) { return 'sk100_photo_' + n; }
+
+function loadPhoto(n) {
+  try { return localStorage.getItem(photoKey(n)); } catch(e) { return null; }
+}
+function savePhoto(n, dataUrl) {
+  try { localStorage.setItem(photoKey(n), dataUrl); } catch(e) {
+    alert('No hay espacio suficiente en el dispositivo para guardar la foto.');
+  }
+}
+function deletePhoto(n) {
+  try { localStorage.removeItem(photoKey(n)); } catch(e) {}
+}
+
+function refreshPhotoUI() {
+  const photo = loadPhoto(activeDay);
+  const placeholder = document.getElementById('photoPlaceholder');
+  const preview = document.getElementById('photoPreview');
+  const actions = document.getElementById('photoActions');
+  if (photo) {
+    preview.src = photo;
+    preview.style.display = 'block';
+    placeholder.style.display = 'none';
+    actions.style.display = 'flex';
+  } else {
+    preview.style.display = 'none';
+    placeholder.style.display = 'flex';
+    actions.style.display = 'none';
+  }
+}
+
+function triggerPhotoUpload() {
+  document.getElementById('photoInput').click();
+}
+
+document.getElementById('photoPlaceholder').addEventListener('click', triggerPhotoUpload);
+document.getElementById('btnChangePhoto').addEventListener('click', triggerPhotoUpload);
+document.getElementById('btnDeletePhoto').addEventListener('click', () => {
+  if (!activeDay) return;
+  deletePhoto(activeDay);
+  refreshPhotoUI();
+});
+
+document.getElementById('photoInput').addEventListener('change', function() {
+  if (!this.files || !this.files[0] || !activeDay) return;
+  const file = this.files[0];
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    // Comprimir imagen antes de guardar
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement('canvas');
+      const maxW = 800;
+      const scale = img.width > maxW ? maxW / img.width : 1;
+      canvas.width = img.width * scale;
+      canvas.height = img.height * scale;
+      canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+      const compressed = canvas.toDataURL('image/jpeg', 0.75);
+      savePhoto(activeDay, compressed);
+      refreshPhotoUI();
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+  this.value = '';
+});
+
+// ═══════════════════════════════════════
+// GALERÍA / SLIDESHOW
+// ═══════════════════════════════════════
+let ssPhotos = []; // [{n, src, title}]
+let ssIndex = 0;
+let ssInterval = null;
+let ssPlaying = false;
+
+function openGallery() {
+  // Recoger todas las fotos guardadas
+  ssPhotos = [];
+  for (let n = 1; n <= 100; n++) {
+    const src = loadPhoto(n);
+    if (src) ssPhotos.push({ n, src, title: DAYS[n-1].t });
+  }
+  if (ssPhotos.length === 0) {
+    alert('Aún no has añadido ningún dibujo. Abre un día y sube tu foto.');
+    return;
+  }
+  ssIndex = 0;
+  ssPlaying = false;
+  document.getElementById('ssPlay').textContent = '▶';
+  renderSlide();
+  document.getElementById('galleryOverlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeGallery() {
+  stopSlideshow();
+  document.getElementById('galleryOverlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+function renderSlide() {
+  const p = ssPhotos[ssIndex];
+  document.getElementById('ssImg').src = p.src;
+  document.getElementById('ssCaption').innerHTML =
+    '<strong>Día ' + p.n + '</strong> · ' + p.title;
+  document.getElementById('ssCounter').textContent =
+    (ssIndex + 1) + ' / ' + ssPhotos.length;
+  document.getElementById('ssPrev').disabled = ssIndex === 0;
+  document.getElementById('ssNext').disabled = ssIndex === ssPhotos.length - 1;
+}
+
+function startSlideshow() {
+  ssPlaying = true;
+  document.getElementById('ssPlay').textContent = '⏸';
+  ssInterval = setInterval(() => {
+    if (ssIndex < ssPhotos.length - 1) {
+      ssIndex++;
+      renderSlide();
+    } else {
+      stopSlideshow();
+    }
+  }, 2500);
+}
+
+function stopSlideshow() {
+  ssPlaying = false;
+  document.getElementById('ssPlay').textContent = '▶';
+  clearInterval(ssInterval);
+  ssInterval = null;
+}
+
+document.getElementById('btnGallery').addEventListener('click', openGallery);
+document.getElementById('btnGalleryClose').addEventListener('click', closeGallery);
+document.getElementById('ssPrev').addEventListener('click', () => {
+  if (ssIndex > 0) { ssIndex--; renderSlide(); }
+});
+document.getElementById('ssNext').addEventListener('click', () => {
+  if (ssIndex < ssPhotos.length - 1) { ssIndex++; renderSlide(); }
+});
+document.getElementById('ssPlay').addEventListener('click', () => {
+  if (ssPlaying) stopSlideshow();
+  else {
+    if (ssIndex === ssPhotos.length - 1) ssIndex = 0;
+    startSlideshow();
+    renderSlide();
+  }
+});
+
+// ═══════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════
+renderCalendar();
+</script>
+</body>
+</html>
